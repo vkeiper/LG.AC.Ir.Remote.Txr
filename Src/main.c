@@ -58,6 +58,7 @@
 uint8_t NbLoop = 1;
 #endif /* EE_M24LR64 */
 __IO uint8_t ubKeyPressed = RESET; 
+uint8_t i;
 
 BSP_DemoTypedef BSP_examples[]=
 {
@@ -112,17 +113,39 @@ int main(void)
   
   //Display_DemoDescription();
 	
-	TIM1_Init();
-	/*Init timer that sets carrier freq for IR remote TX*/
-  //TIM10_Init();
+
+	
   /* Wait For User inputs */
   while (1)
   {
     //if(BSP_PB_GetState(BUTTON_KEY) == RESET)
     //{
     //  while (BSP_PB_GetState(BUTTON_KEY) == RESET);
+		
+		  
+	static uint32_t t_run=0;
+    
+	
+	if(HAL_GetTick() > t_run + 1000){
+		t_run = HAL_GetTick();
+		
+		if(i<4){
+			SendFrame(BTN_TUP);
+		}else{
+			SendFrame(BTN_TDN);
+		}
+		
+    if(i >7)
+				i=0;
+	}else{
+		
+		if(ubKeyPressed == SET){
+			  SendFrame(BTN_TUP);
+			  ubKeyPressed = RESET;
+		}
+	}
+	
       
-      BSP_examples[0].DemoFunc();
       
       //if(DemoIndex >= COUNT_OF_EXAMPLE(BSP_examples))
       //{

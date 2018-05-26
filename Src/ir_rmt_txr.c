@@ -14,6 +14,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "lcd_log.h"
 #include "ir_rmt_txr.h"
+#include <string.h>
 
 /** @addtogroup VGK_Apps
   * @{
@@ -42,8 +43,22 @@
 #define WAITTX 3u
 #define EOFTX   4u
 #define DONETX 5u
+#define IDLESTA 6u
 
-char dispstr[16];
+#define CARFQY (38000u)
+#define TMRFQY (CARFQY * 2u)
+#define TMRPRD  (1/TMRFQY)
+
+#define MSCNT_9 (684) //count of how many cycles in 9mS 1 cycle is 26uS (timer ticks at 13uS)
+#define MSCNT_4p5 (342) //count of how many cycles 4.5mS/564uS
+
+
+char dispstr[512];
+uint16_t charcnt=0;
+
+uint32_t tickcnt;
+uint8_t pinmask=0;
+uint8_t bSync=0;
 
 typedef struct modrc5_frames_t{
    char title[32];
@@ -66,10 +81,10 @@ ModRc5Frame_t FramePwr = {
     9000u,/*9mS 9000uS*/
     4500u,/*4.5mS 4500uS*/
     564u,/*pulse length*/
-    3u
+    3u/*on pulse multiplier*/
 }; 
 ModRc5Frame_t FrameMode = {
-    "Power-ON/OFF",
+    "Mode +",
     0x81,
     0x66,
     0xD9,/*Mode, each tx rotates mode */
@@ -77,18 +92,18 @@ ModRc5Frame_t FrameMode = {
     9000u,/*9mS 9000uS*/
     4500u,/*4.5mS 4500uS*/
     564u,/*pulse length*/
-    3u
+    3u/*on pulse multiplier*/
 }; 
 ModRc5Frame_t FrameTempUp = {
     "Temp +",
     0x81,
     0x66,
-    0xAE,/*Temperature setpoint increase */
-    (uint8_t)~0xAE,
+    0xA1,/*Temperature setpoint increase 0b10101110*/  
+    (uint8_t)~0xA1,/*0b01010001*/
     9000u,/*9mS 9000uS*/
     4500u,/*4.5mS 4500uS*/
     564u,/*pulse length*/
-    3u
+    3u/*on pulse multiplier*/
 }; 
 ModRc5Frame_t FrameTempDn = {
     "Temp -",
@@ -110,7 +125,7 @@ ModRc5Frame_t FrameFanSpd = {
     9000u,/*9mS 9000uS*/
     4500u,/*4.5mS 4500uS*/
     564u,/*pulse length*/
-    3u
+    3u/*on pulse multiplier*/
 }; 
 
 ModRc5Frame_t FrameTimer = {
@@ -122,7 +137,7 @@ ModRc5Frame_t FrameTimer = {
     9000u,/*9mS 9000uS*/
     4500u,/*4.5mS 4500uS*/
     564u,/*pulse length*/
-    3u
+    3u/*on pulse multiplier*/
 }; 
 
 /*Init an array of pointers to all the frame objects */
@@ -143,43 +158,48 @@ ModRc5Frame_t *pFrames[] = {
 #define FRMTMPDN 3u
 #define FRMFAN   4u
 
+#define ONPERIODCNT 42u // ONPERIOD / TMRPRD  564uS/13uS
+#define ONPERIOD 564u
+#define IRFRAMEBYTES 32u
 
+
+static uint8_t lastState = INITTX;
+static uint8_t TxState = INITTX;
+static uint8_t FrmIdx =0;
+  	
+
+
+uint8_t SendFrame(uint8_t fIdx){
+	/*  */
+	if(TxState == INITTX || TxState == DONETX){
+		FrmIdx = fIdx;
+		/* Trigger the tier to start */
+		if(TxState != INITTX){
+			TxState = IDLESTA;
+		}
+		/*if starting in Idle state the timer gets enabled*/
+		Do_Ir_Rmt_Txr();
+		return 1u;
+	}else{
+		return 0u;
+	}
+	
+	
+}
 
 /**
-  * @brief  Run IR rmt state machine 
+  * @brief  Run IR rmt state machine gets called by Timer1 period elapsed callback
   * @param  None
   * @retval None
   */
 void Do_Ir_Rmt_Txr(void)
 { 
-  uint8_t ADR1 = 0x81, ADR2 = 0x66, CMDID = 0x81, CHK = ~CMDID;
+  static uint8_t ADR1, ADR2,CMDID, CHK;
   static uint16_t bitsSent=0;
-  static uint8_t FrmIdx =0;
+  static uint8_t offPdMult=1;/* '0' lo = 1 period '1'hi = 3 periods*/ 
+  static uint32_t DataToTx = 0u;  
     
-  ADR1 = (uint8_t)pFrames[FrmIdx]->adr2;
   
-  /*build data tx frame*/
-  uint32_t DataToTx = 0u;
-  DataToTx |= ADR1<<24; 
-  DataToTx |= ADR2<<16;
-  DataToTx |= CMDID<<8; 
-  DataToTx |= CHK;
-    
-  //enum IrStates {INIT,SOF,DATA,WAIT,EOF,DONE};
-  //enum IrStates IrState;  
-
-  static uint8_t TxState = INITTX,lastState;
-	
-	static uint32_t t_run=0;
-    
-	
-	if(HAL_GetTick() < t_run +250){
-		return;
-	}else{
-		t_run = HAL_GetTick();
-	}
-	
-	
   switch(TxState){
 
       case INITTX:
@@ -189,69 +209,140 @@ void Do_Ir_Rmt_Txr(void)
           
           /* Show Header and Footer texts */
           LCD_LOG_SetHeader((uint8_t*)"IR Remote Tx'r");
-          //sprintf(dispstr,"%4s Ver %d.%d.%d %d/%d/%d %d:%d",AUTHRABR,MAJVER,
+          LCD_UsrLog("IR Remote Tx'r Init \n");
+			    //sprintf(dispstr,"%4s Ver %d.%d.%d %d/%d/%d %d:%d",AUTHRABR,MAJVER,
           //          MINVER,BLDVER,YERVER,MONVER,DAYVER,HRSVER,MNSVER);
           //LCD_LOG_SetFooter((uint8_t*)dispstr);
           //LCD_UsrLog ("Author %s \n",AUTHRFULL);
       
+			    /* Start in idle state so APP controls when frame gets sent*/
           TxState = SOFTX;
 			
-          //HAL_TIM_Base_Start_IT(&htim1); //Start the timer
-					//HAL_TIM_Base_Start_IT(&htim10); //Start the timer
-
-          
-      break;
+			    /* sets up timer for 38Khz 50% duty cycle wave */
+					tickcnt=0;
+				  pinmask = 1u;
+          TIM1_Init();
+          HAL_TIM_Base_Start_IT(&htim1);
+      
       
       case SOFTX:
-        LCD_UsrLog ("TX SOF \n" );
-        LCD_UsrLog ("DATA= 0x%8x \n",DataToTx );
+        //LCD_UsrLog ("TX SOF \n" );
+        //LCD_UsrLog ("DATA= 0x%8x \n",DataToTx );
         
       //TODO:/* Setup TMR to send 38Khz carrier for 9mS then pause for 4.5mS */
-      
-        TxState = TXDATA;
-      
+				if(tickcnt <2){
+					BSP_LED_Off(LED3);//set low to start
+					
+					charcnt=0;
+					ADR1 = (uint8_t)pFrames[FrmIdx]->adr1;
+					ADR2 = (uint8_t)pFrames[FrmIdx]->adr2;
+					CMDID = (uint8_t)pFrames[FrmIdx]->cmd;
+					CHK = (uint8_t)pFrames[FrmIdx]->chk;
+
+
+					/*build data tx frame*/
+					DataToTx |= ADR1<<24; 
+					DataToTx |= ADR2<<16;
+					DataToTx |= CMDID<<8; 
+					DataToTx |= CHK;
+					memset(dispstr,0u,sizeof(dispstr));
+					sprintf(dispstr+charcnt,"TX SOF \n DATA= 0x%8x \n",DataToTx );
+			    charcnt += strlen(dispstr);
+				}/*start if carrier ON period*/
+				else if(tickcnt >1 && (tickcnt <=(MSCNT_9))){
+				  BSP_LED_Toggle(LED3);
+				}/* End of OFF period*/
+				
+				/* End of CARRIER ON period*/
+				else if((tickcnt >MSCNT_9) && (tickcnt <=(MSCNT_9 + MSCNT_4p5))){
+				  BSP_LED_Off(LED3);
+				}/* End of OFF period*/
+				else{
+					//unlock pin control
+					TxState = TXDATA;
+					tickcnt=0;
+				}
+				
+				
     
       break;
       
       case TXDATA:
-        LCD_UsrLog ("TX DATA QTY:%d  BIT=%d  \n",bitsSent,(DataToTx<<bitsSent & 0x80000000) ? 1 : 0 );
-      //TODO: Add code to send carrier for 564uS then test bit and if 1 pause 564uS else pause 564uS*3  
-      
-        bitsSent++;
-        lastState = TxState;
-      
-        if(bitsSent >31){
-            TxState = EOFTX;
-        }else{
-            TxState = WAITTX;
-        }
-      
-          //BSP_LED_Toggle(LED3);
+				BSP_LED_Toggle(LED4);
+			
+        if(tickcnt <2){
+						BSP_LED_Off(LED3);//set low to start CARRIER ON period
+				}
+				
+				// Send carrier for 564uS then test bit and if 1 pause 564uS else pause 564uS*3  
+			  if(tickcnt <ONPERIODCNT){
+						BSP_LED_Toggle(LED3);
+				}/*564uS carrier freq ON period over*/	
+				else if(tickcnt >=ONPERIODCNT && tickcnt < ONPERIODCNT+1){
+						BSP_LED_Off(LED3);//set low to start CARRIER ON period
+						
+						// if bit to be sent is 1, off period (pinmask = 0x00) for 
+						if(DataToTx<<bitsSent & 0x80000000){
+									offPdMult = 3u;/* '0' lo = 3 period */
+						}else{
+									offPdMult = 1u;/* '1' hi = 1 period */
+						}
+				}/* keep LED off for 1 or 3, 564uS periods based on state of bit being tx'd */	
+				else if(tickcnt >=(ONPERIODCNT + (ONPERIODCNT * offPdMult))){
+						//LCD_UsrLog ("BITs Sent:%d  BIT=%d Mult:%d \n",bitsSent,(DataToTx<<bitsSent & 0x80000000) ? 1 : 0,offPdMult );
+						tickcnt = 0u;/*set to get back into tx next bit*/
+						bitsSent++;
+						
+						/* Always exit through here, frame is always 32bits*/
+						if(bitsSent > IRFRAMEBYTES){
+								TxState = EOFTX;
+								tickcnt =0;/*reset for EOF to count out time it needs to send carrier freq*/
+						}
+				}
+
       break;
-      /** The WAIT occurs in each state, the state before kicks off the process of sending the carrier
-       *  freq for required amount of time. Then we come back to wait for the pause time depending on state 
-       *  and OR each bit value within the TXDATA state
-       */
-      case WAITTX:
-        LCD_UsrLog ("WAIT DATA to TX \n" );
-        TxState = lastState;
-        
-      break;
+      
       
       case EOFTX:
-          LCD_UsrLog ("TX EOF \n" );
-          TxState = DONETX;
+          if(tickcnt <2){
+						BSP_LED_Off(LED3);//set low to start CARRIER ON period
+					  
+				//sprintf(dispstr+charcnt,"TX EOF\n");
+						//charcnt += strlen(dispstr);
+					}
+				
+					
+					// Send carrier for one ON period of 564uS 
+					if(tickcnt <ONPERIODCNT){
+						//BSP_LED_Toggle(LED3);
+					/*564uS carrier freq ON period over*/	
+					}else{
+						TxState = DONETX;
+						BSP_LED_Off(LED3);
+					}						
         
           
       break;
       
       case DONETX:
-        /* Clear Old logs */
-        //LCD_LOG_ClearTextZone();
-        TxState = SOFTX;
-        bitsSent=0;
-        FrmIdx=0;
+        HAL_TIM_Base_Stop_IT(&htim1);
+        //LCD_UsrLog ("%s",dispstr);
+        BSP_LED_Off(LED3);
+			  bitsSent=0;
+        tickcnt=0;
+			  
+      break;
       
+			case IDLESTA:
+        LCD_UsrLog ("Sending %s  Idx:%d \n",pFrames[FrmIdx]->title,FrmIdx);
+        LCD_UsrLog ("CMID %d CHK %d \n",pFrames[FrmIdx]->cmd,pFrames[FrmIdx]->chk);
+        lastState = IDLESTA;
+				TxState = SOFTX;
+        bitsSent=0;
+        tickcnt=0;
+			  BSP_LED_Off(LED3);
+			  HAL_TIM_Base_Start_IT(&htim1);
+        
       break;
       
 

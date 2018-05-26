@@ -51,3 +51,4 @@ stm32f429i-discovery\tim.o: ..\..\..\..\..\Drivers\BSP\STM32F429I-Discovery\../C
 stm32f429i-discovery\tim.o: ..\..\..\..\..\Drivers\BSP\STM32F429I-Discovery\stm32f429i_discovery_gyroscope.h
 stm32f429i-discovery\tim.o: ..\..\..\..\..\Drivers\BSP\STM32F429I-Discovery\../Components/l3gd20/l3gd20.h
 stm32f429i-discovery\tim.o: ..\..\..\..\..\Drivers\BSP\STM32F429I-Discovery\../Components/l3gd20/../Common/gyro.h
+stm32f429i-discovery\tim.o: ..\Inc\ir_rmt_txr.h

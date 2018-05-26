@@ -39,6 +39,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "tim.h"
+#include "ir_rmt_txr.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -128,7 +129,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
     HAL_NVIC_EnableIRQ(TIM1_UP_TIM10_IRQn);
 		
 		/* Enable the timer clock */
-		HAL_TIM_Base_Start_IT(tim_baseHandle);
+		//HAL_TIM_Base_Start_IT(tim_baseHandle);
   }
 //		else if(tim_baseHandle->Instance==TIM10)
 //  {
@@ -199,16 +200,20 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	  // This callback is automatically called by the HAL on the UEV event
-	  
+	  static uint8_t state=0;
+	
 	  if(htim->Instance == TIM1){
-		  	BSP_LED_Toggle(LED3);
-				//HAL_TIM_Base_Start_IT(&htim1); //Start the timer
+//				if(pinmask == 0u){
+//					BSP_LED_Off(LED3);
+//				}else{
+//					BSP_LED_Toggle(LED3);
+//				}
+//				
+				tickcnt++;
+				
+				/* run state machine*/
+				Do_Ir_Rmt_Txr();
 	  }
-//		if(htim->Instance == TIM10){
-//		  	BSP_LED_Toggle(LED4);
-//				//HAL_TIM_Base_Start_IT(&htim10); //Start the timer
-
-//	  }
 }
 
 /* USER CODE END 1 */

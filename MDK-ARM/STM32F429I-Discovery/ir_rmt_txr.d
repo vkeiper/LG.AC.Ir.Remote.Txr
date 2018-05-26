@@ -54,3 +54,4 @@ stm32f429i-discovery\ir_rmt_txr.o: ..\..\..\..\..\Drivers\BSP\STM32F429I-Discove
 stm32f429i-discovery\ir_rmt_txr.o: ..\..\..\..\..\Drivers\BSP\STM32F429I-Discovery\../Components/l3gd20/l3gd20.h
 stm32f429i-discovery\ir_rmt_txr.o: ..\..\..\..\..\Drivers\BSP\STM32F429I-Discovery\../Components/l3gd20/../Common/gyro.h
 stm32f429i-discovery\ir_rmt_txr.o: ..\Inc\tim.h
+stm32f429i-discovery\ir_rmt_txr.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
