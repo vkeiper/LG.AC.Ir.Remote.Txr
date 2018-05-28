@@ -62,9 +62,29 @@
 #define AUTHRFULL "Vince Keiper"
 #define AUTHRABR "V.K. "
 
-/*TIM10 OC output*/
-#define IR_LED_OUT_Pin GPIO_PIN_6
-#define IR_LED_OUT_GPIO_Port GPIOF
+
+
+#define AIN_TEMP_ROOM_Pin GPIO_PIN_6
+#define AIN_TEMP_ROOM_GPIO_Port GPIOF
+#define AIN_TEMP_ACOIL_Pin GPIO_PIN_5
+#define AIN_TEMP_ACOIL_GPIO_Port GPIOA
+
+
+#define DI_MANMODE_Pin GPIO_PIN_2
+#define DI_MANMODE_GPIO_Port GPIOE
+#define DI_DMD_Pin GPIO_PIN_3
+#define DI_DMD_GPIO_Port GPIOE
+#define DO_MAINS_SSR_Pin GPIO_PIN_4
+#define DO_MAINS_SSR_GPIO_Port GPIOE
+#define DO_CIRC_SSR_Pin GPIO_PIN_5
+#define DO_CIRC_SSR_GPIO_Port GPIOE
+#define DO_EVAP_SSR_Pin GPIO_PIN_6
+#define DO_EVAP_SSR_GPIO_Port GPIOE
+#define DO_IRLED_Pin GPIO_PIN_2
+#define DO_IRLED_GPIO_Port GPIOD
+#define IRLED_GPIO_CLK_ENABLE()                  __HAL_RCC_GPIOD_CLK_ENABLE()  
+#define IRLED_GPIO_CLK_DISABLE()                 __HAL_RCC_GPIOD_CLK_DISABLE()  
+
 
 /* Exported types ------------------------------------------------------------*/
 typedef struct

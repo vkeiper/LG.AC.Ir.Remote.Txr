@@ -502,6 +502,26 @@
               <FileType>1</FileType>
               <FilePath>..\Src\tim.c</FilePath>
             </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>10kntc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\10kntc.c</FilePath>
+            </File>
+            <File>
+              <FileName>hvac_ctl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\hvac_ctl.c</FilePath>
+            </File>
+            <File>
+              <FileName>gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\gpio.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -722,6 +742,16 @@
               <FileName>stm32f4xx_hal_rcc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_rcc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_hal_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_hal_adc_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_adc_ex.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1192,6 +1222,26 @@
               <FileType>1</FileType>
               <FilePath>..\Src\tim.c</FilePath>
             </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>10kntc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\10kntc.c</FilePath>
+            </File>
+            <File>
+              <FileName>hvac_ctl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\hvac_ctl.c</FilePath>
+            </File>
+            <File>
+              <FileName>gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\gpio.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1361,6 +1411,16 @@
               <FileName>stm32f4xx_hal_rcc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_rcc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_hal_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_hal_adc_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_adc_ex.c</FilePath>
             </File>
           </Files>
         </Group>

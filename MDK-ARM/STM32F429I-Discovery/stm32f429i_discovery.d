@@ -21,6 +21,8 @@ stm32f429i-discovery\stm32f429i_discovery.o: ..\..\..\..\..\Drivers\STM32F4xx_HA
 stm32f429i-discovery\stm32f429i_discovery.o: ..\..\..\..\..\Drivers\STM32F4xx_HAL_Driver\inc\stm32f4xx_hal_dma.h
 stm32f429i-discovery\stm32f429i_discovery.o: ..\..\..\..\..\Drivers\STM32F4xx_HAL_Driver\inc\stm32f4xx_hal_dma_ex.h
 stm32f429i-discovery\stm32f429i_discovery.o: ..\..\..\..\..\Drivers\STM32F4xx_HAL_Driver\inc\stm32f4xx_hal_cortex.h
+stm32f429i-discovery\stm32f429i_discovery.o: ..\..\..\..\..\Drivers\STM32F4xx_HAL_Driver\inc\stm32f4xx_hal_adc.h
+stm32f429i-discovery\stm32f429i_discovery.o: ..\..\..\..\..\Drivers\STM32F4xx_HAL_Driver\inc\stm32f4xx_hal_adc_ex.h
 stm32f429i-discovery\stm32f429i_discovery.o: ..\..\..\..\..\Drivers\STM32F4xx_HAL_Driver\inc\stm32f4xx_hal_dma2d.h
 stm32f429i-discovery\stm32f429i_discovery.o: ..\..\..\..\..\Drivers\STM32F4xx_HAL_Driver\inc\stm32f4xx_hal_flash.h
 stm32f429i-discovery\stm32f429i_discovery.o: ..\..\..\..\..\Drivers\STM32F4xx_HAL_Driver\inc\stm32f4xx_hal_flash_ex.h

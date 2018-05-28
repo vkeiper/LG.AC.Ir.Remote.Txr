@@ -29,6 +29,10 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
+void IRLED_Init(void);
+void IRLED_On(void);
+void IRLED_Off(void);
+void IRLED_Toggle(void);
 /* Private functions ---------------------------------------------------------*/
 
 
@@ -204,16 +208,12 @@ void Do_Ir_Rmt_Txr(void)
 
       case INITTX:
           
-          /* Initialize LCD Log module */
-          LCD_LOG_Init();
-          
-          /* Show Header and Footer texts */
-          LCD_LOG_SetHeader((uint8_t*)"IR Remote Tx'r");
-          LCD_UsrLog("IR Remote Tx'r Init \n");
-			    //sprintf(dispstr,"%4s Ver %d.%d.%d %d/%d/%d %d:%d",AUTHRABR,MAJVER,
+          //sprintf(dispstr,"%4s Ver %d.%d.%d %d/%d/%d %d:%d",AUTHRABR,MAJVER,
           //          MINVER,BLDVER,YERVER,MONVER,DAYVER,HRSVER,MNSVER);
           //LCD_LOG_SetFooter((uint8_t*)dispstr);
           //LCD_UsrLog ("Author %s \n",AUTHRFULL);
+			
+					IRLED_Init();
       
 			    /* Start in idle state so APP controls when frame gets sent*/
           TxState = SOFTX;
@@ -231,7 +231,7 @@ void Do_Ir_Rmt_Txr(void)
         
       //TODO:/* Setup TMR to send 38Khz carrier for 9mS then pause for 4.5mS */
 				if(tickcnt <2){
-					BSP_LED_Off(LED3);//set low to start
+					IRLED_Off();//set low to start
 					
 					charcnt=0;
 					ADR1 = (uint8_t)pFrames[FrmIdx]->adr1;
@@ -250,12 +250,12 @@ void Do_Ir_Rmt_Txr(void)
 			    charcnt += strlen(dispstr);
 				}/*start if carrier ON period*/
 				else if(tickcnt >1 && (tickcnt <=(MSCNT_9))){
-				  BSP_LED_Toggle(LED3);
+				  IRLED_Toggle();
 				}/* End of OFF period*/
 				
 				/* End of CARRIER ON period*/
 				else if((tickcnt >MSCNT_9) && (tickcnt <=(MSCNT_9 + MSCNT_4p5))){
-				  BSP_LED_Off(LED3);
+				  IRLED_Off();
 				}/* End of OFF period*/
 				else{
 					//unlock pin control
@@ -268,18 +268,16 @@ void Do_Ir_Rmt_Txr(void)
       break;
       
       case TXDATA:
-				BSP_LED_Toggle(LED4);
-			
-        if(tickcnt <2){
-						BSP_LED_Off(LED3);//set low to start CARRIER ON period
+				if(tickcnt <2){
+						IRLED_Off();//set low to start CARRIER ON period
 				}
 				
 				// Send carrier for 564uS then test bit and if 1 pause 564uS else pause 564uS*3  
 			  if(tickcnt <ONPERIODCNT){
-						BSP_LED_Toggle(LED3);
+						IRLED_Toggle();
 				}/*564uS carrier freq ON period over*/	
 				else if(tickcnt >=ONPERIODCNT && tickcnt < ONPERIODCNT+1){
-						BSP_LED_Off(LED3);//set low to start CARRIER ON period
+						IRLED_Off();//set low to start CARRIER ON period
 						
 						// if bit to be sent is 1, off period (pinmask = 0x00) for 
 						if(DataToTx<<bitsSent & 0x80000000){
@@ -305,7 +303,7 @@ void Do_Ir_Rmt_Txr(void)
       
       case EOFTX:
           if(tickcnt <2){
-						BSP_LED_Off(LED3);//set low to start CARRIER ON period
+						IRLED_Off();//set low to start CARRIER ON period
 					  
 				//sprintf(dispstr+charcnt,"TX EOF\n");
 						//charcnt += strlen(dispstr);
@@ -314,11 +312,11 @@ void Do_Ir_Rmt_Txr(void)
 					
 					// Send carrier for one ON period of 564uS 
 					if(tickcnt <ONPERIODCNT){
-						//BSP_LED_Toggle(LED3);
+						//IRLED_Toggle();
 					/*564uS carrier freq ON period over*/	
 					}else{
 						TxState = DONETX;
-						BSP_LED_Off(LED3);
+						IRLED_Off();
 					}						
         
           
@@ -327,7 +325,7 @@ void Do_Ir_Rmt_Txr(void)
       case DONETX:
         HAL_TIM_Base_Stop_IT(&htim1);
         //LCD_UsrLog ("%s",dispstr);
-        BSP_LED_Off(LED3);
+        IRLED_Off();
 			  bitsSent=0;
         tickcnt=0;
 			  
@@ -335,12 +333,12 @@ void Do_Ir_Rmt_Txr(void)
       
 			case IDLESTA:
         LCD_UsrLog ("Sending %s  Idx:%d \n",pFrames[FrmIdx]->title,FrmIdx);
-        LCD_UsrLog ("CMID %d CHK %d \n",pFrames[FrmIdx]->cmd,pFrames[FrmIdx]->chk);
+        LCD_UsrLog ("CMID 0x%2x CHK 0x%2x \n",pFrames[FrmIdx]->cmd,pFrames[FrmIdx]->chk);
         lastState = IDLESTA;
 				TxState = SOFTX;
         bitsSent=0;
         tickcnt=0;
-			  BSP_LED_Off(LED3);
+			  IRLED_Off();
 			  HAL_TIM_Base_Start_IT(&htim1);
         
       break;
@@ -355,6 +353,57 @@ void Do_Ir_Rmt_Txr(void)
   
 }
 
+
+
+/**
+  * @brief  Configures IRLED GPIO.
+  *
+  */
+void IRLED_Init(void)
+{
+  GPIO_InitTypeDef  GPIO_InitStruct;
+  
+  /* Enable the GPIO_LED Clock */
+  IRLED_GPIO_CLK_ENABLE();
+	
+  /* Configure the GPIO_LED pin */
+  GPIO_InitStruct.Pin =   DO_IRLED_Pin;
+  GPIO_InitStruct.Mode =  GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull =  GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
+  
+  HAL_GPIO_Init(DO_IRLED_GPIO_Port, &GPIO_InitStruct);
+  
+	/*start with LED off*/
+  HAL_GPIO_WritePin(DO_IRLED_GPIO_Port, DO_IRLED_Pin, GPIO_PIN_RESET); 
+}
+
+/**
+  * @brief  Turns IRLED On.
+  *    
+  */
+void IRLED_On(void)
+{
+  HAL_GPIO_WritePin(DO_IRLED_GPIO_Port, DO_IRLED_Pin, GPIO_PIN_SET); 
+}
+
+/**
+  * @brief  Turns IRLED Off.
+  *    
+  */
+void IRLED_Off(void)
+{
+  HAL_GPIO_WritePin(DO_IRLED_GPIO_Port, DO_IRLED_Pin, GPIO_PIN_RESET); 
+}
+
+/**
+  * @brief  Toggles IRLED state.
+  *    
+  */
+void IRLED_Toggle(void)
+{
+  HAL_GPIO_TogglePin(DO_IRLED_GPIO_Port, DO_IRLED_Pin); 
+}
 /**
   * @}
   */ 

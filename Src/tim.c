@@ -82,40 +82,6 @@ void TIM1_Init(void)
 }
 
 
-///* TIM10 init function */
-//void TIM10_Init(void)
-//{
-//  TIM_OC_InitTypeDef sConfigOC;
-
-//  htim10.Instance = TIM10;
-//  htim10.Init.Prescaler = 0;
-//  htim10.Init.CounterMode = TIM_COUNTERMODE_UP;
-//  htim10.Init.Period = 63167;
-//  htim10.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-//  if (HAL_TIM_Base_Init(&htim10) != HAL_OK)
-//  {
-//    //_Error_Handler(__FILE__, __LINE__);
-//		BSP_LED_On(LED4);
-//  }
-
-//  if (HAL_TIM_OC_Init(&htim10) != HAL_OK)
-//  {
-//    //_Error_Handler(__FILE__, __LINE__);
-//		BSP_LED_On(LED4);
-//  }
-
-//  sConfigOC.OCMode = TIM_OCMODE_TOGGLE;
-//  sConfigOC.Pulse = 65535;
-//  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-//  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-//  if (HAL_TIM_OC_ConfigChannel(&htim10, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
-//  {
-//    //_Error_Handler(__FILE__, __LINE__);
-//  }
-
-//  HAL_TIM_MspPostInit(&htim10);
-//	
-//}
 
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
 {
@@ -131,48 +97,8 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
 		/* Enable the timer clock */
 		//HAL_TIM_Base_Start_IT(tim_baseHandle);
   }
-//		else if(tim_baseHandle->Instance==TIM10)
-//  {
-//  /* USER CODE BEGIN TIM10_MspInit 0 */
-
-//  /* USER CODE END TIM10_MspInit 0 */
-//    /* TIM10 clock enable */
-//    __HAL_RCC_TIM10_CLK_ENABLE();
-
-//    /* TIM10 interrupt Init */
-//    HAL_NVIC_SetPriority(TIM1_UP_TIM10_IRQn, 3, 0);
-//    HAL_NVIC_EnableIRQ(TIM1_UP_TIM10_IRQn);
-//  /* USER CODE BEGIN TIM10_MspInit 1 */
-
-//  /* USER CODE END TIM10_MspInit 1 */
-//  }
 }
-//void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
-//{
 
-//  GPIO_InitTypeDef GPIO_InitStruct;
-//  if(timHandle->Instance==TIM10)
-//  {
-//  /* USER CODE BEGIN TIM10_MspPostInit 0 */
-
-//  /* USER CODE END TIM10_MspPostInit 0 */
-//  
-//    /**TIM10 GPIO Configuration    
-//    PF6     ------> TIM10_CH1 
-//    */
-//    GPIO_InitStruct.Pin = IR_LED_OUT_Pin;
-//    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-//    GPIO_InitStruct.Pull = GPIO_NOPULL;
-//    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-//    GPIO_InitStruct.Alternate = GPIO_AF3_TIM10;
-//    HAL_GPIO_Init(IR_LED_OUT_GPIO_Port, &GPIO_InitStruct);
-
-//  /* USER CODE BEGIN TIM10_MspPostInit 1 */
-
-//  /* USER CODE END TIM10_MspPostInit 1 */
-//  }
-
-//}
 
 void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 {
@@ -200,17 +126,9 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	  // This callback is automatically called by the HAL on the UEV event
-	  static uint8_t state=0;
 	
 	  if(htim->Instance == TIM1){
-//				if(pinmask == 0u){
-//					BSP_LED_Off(LED3);
-//				}else{
-//					BSP_LED_Toggle(LED3);
-//				}
-//				
 				tickcnt++;
-				
 				/* run state machine*/
 				Do_Ir_Rmt_Txr();
 	  }

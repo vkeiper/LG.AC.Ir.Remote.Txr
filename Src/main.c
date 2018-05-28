@@ -38,8 +38,13 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stlogo.h"
+#include "lcd_log.h"
 #include "ir_rmt_txr.h"
 #include "tim.h"
+#include "adc.h"
+#include "gpio.h"
+#include "10kntc.h"
+#include "hvac_ctl.h"
 
 /** @addtogroup STM32F4xx_HAL_Examples
   * @{
@@ -85,6 +90,8 @@ static void SystemClock_Config(void);
   */
 int main(void)
 { 
+	static uint32_t t_run=0, t_txmode=0;
+    
   /* STM32F4xx HAL library initialization:
        - Configure the Flash prefetch, instruction and Data caches
        - Configure the Systick to generate an interrupt each 1 msec
@@ -107,40 +114,59 @@ int main(void)
   /*##-1- Initialize the LCD #################################################*/
   /* Initialize the LCD */
   BSP_LCD_Init();
-  
+	  
   /* Initialize the LCD Layers */
   BSP_LCD_LayerDefaultInit(0, LCD_FRAME_BUFFER);
   
-  //Display_DemoDescription();
+	/* Initialize LCD Log module */
+	LCD_LOG_Init();
 	
-
+	/* Show Header and Footer texts */
+	LCD_LOG_SetHeader((uint8_t*)"HVAC");
+	LCD_UsrLog("IR Remote Tx'r Init \n");
+	
+	
+	MX_ADC1_Init();
+  MX_ADC3_Init();
+  MX_GPIO_Init();
 	
   /* Wait For User inputs */
   while (1)
   {
-    //if(BSP_PB_GetState(BUTTON_KEY) == RESET)
-    //{
-    //  while (BSP_PB_GetState(BUTTON_KEY) == RESET);
 		
-		  
-	static uint32_t t_run=0;
-    
-	
+		DoHvacSimpleMode();
+		
+		/* Mode change method async of the DoHvac... */
+		/* Mode change register is set in DoHvac with qty tx's needed */
+		if(t_txmode ==0 && ctldata_s.bModeChg >0){
+			  t_txmode = HAL_GetTick();
+				ctldata_s.bModeChg--;	
+		}
+		/* Trigger Mode button press ever 200mS if timer has been set above */
+		if(t_txmode !=0 && (HAL_GetTick() > t_txmode + 200)){
+				SendFrame(BTN_MOD);
+				t_txmode=0;
+		}
+		
+		
 	if(HAL_GetTick() > t_run + 1000){
 		t_run = HAL_GetTick();
 		
-		if(i<4){
-			SendFrame(BTN_TUP);
-		}else{
-			SendFrame(BTN_TDN);
-		}
+			
 		
-    if(i >7)
-				i=0;
 	}else{
 		
 		if(ubKeyPressed == SET){
-			  SendFrame(BTN_TUP);
+			  //if(i<4){
+				//	SendFrame(BTN_TUP);
+				//}else{
+					SendFrame(BTN_PWR);
+				//}
+				//i++;
+				
+				//if(i >7)
+				//	i=0;
+				
 			  ubKeyPressed = RESET;
 		}
 	}
@@ -307,6 +333,16 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
  {
    ubKeyPressed = SET;
  }
+}
+
+
+void HAL_SYSTICK_Callback(void){
+	static uint16_t ticks=1000;
+	
+	if(--ticks==0){
+		ticks=1000;
+		calc_uptime(time_s.time++);
+	}
 }
 
 #ifdef  USE_FULL_ASSERT

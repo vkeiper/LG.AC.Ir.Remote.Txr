@@ -8,6 +8,8 @@
 #define BTN_TMR 4u
 
 
+
+
 extern uint32_t tickcnt;
 extern uint8_t pinmask;
 extern uint8_t bSync;
