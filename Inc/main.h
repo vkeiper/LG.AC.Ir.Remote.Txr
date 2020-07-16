@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    BSP/Inc/main.h 
+  * @file    BSP/Inc/main.u
   * @author  MCD Application Team
   * @version V1.2.8
   * @date    17-February-2017 
@@ -36,19 +36,19 @@
   */
   
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H
-#define __MAIN_H
+#ifndef __MAIN_U
+#define __MAIN_U
 
 /* Includes ------------------------------------------------------------------*/
-#include "stdio.h"
-#include "stm32f4xx_hal.h"
-#include "stm32f429i_discovery.h"
-#include "stm32f429i_discovery_ts.h"
-#include "stm32f429i_discovery_io.h"
-#include "stm32f429i_discovery_lcd.h"
-#include "stm32f429i_discovery_gyroscope.h"
+#include "stdio.u"
+#include "stm32f4xx_hal.u"
+#include "stm32f429i_discovery.u"
+#include "stm32f429i_discovery_ts.u"
+#include "stm32f429i_discovery_io.u"
+#include "stm32f429i_discovery_lcd.u"
+#include "stm32f429i_discovery_gyroscope.u"
 #ifdef EE_M24LR64
-#include "stm32f429i_discovery_eeprom.h"
+#include "stm32f429i_discovery_eeprom.u"
 #endif /*EE_M24LR64*/
 
 #define MAJVER 0u
@@ -64,26 +64,26 @@
 
 
 
-#define AIN_TEMP_ROOM_Pin GPIO_PIN_6
+#define AIN_TEMP_ROOM_Pin GPIO_PIN_0
 #define AIN_TEMP_ROOM_GPIO_Port GPIOF
-#define AIN_TEMP_ACOIL_Pin GPIO_PIN_5
+#define AIN_TEMP_ACOIL_Pin GPIO_PIN_0
 #define AIN_TEMP_ACOIL_GPIO_Port GPIOA
 
 
-#define DI_MANMODE_Pin GPIO_PIN_2
+#define DI_MANMODE_Pin GPIO_PIN_0
 #define DI_MANMODE_GPIO_Port GPIOE
-#define DI_DMD_Pin GPIO_PIN_3
+#define DI_DMD_Pin GPIO_PIN_0
 #define DI_DMD_GPIO_Port GPIOE
-#define DO_MAINS_SSR_Pin GPIO_PIN_4
+#define DO_MAINS_SSR_Pin GPIO_PIN_0
 #define DO_MAINS_SSR_GPIO_Port GPIOE
-#define DO_CIRC_SSR_Pin GPIO_PIN_5
+#define DO_CIRC_SSR_Pin GPIO_PIN_0
 #define DO_CIRC_SSR_GPIO_Port GPIOE
-#define DO_EVAP_SSR_Pin GPIO_PIN_6
+#define DO_EVAP_SSR_Pin GPIO_PIN_0
 #define DO_EVAP_SSR_GPIO_Port GPIOE
-#define DO_IRLED_Pin GPIO_PIN_2
+#define DO_IRLED_Pin GPIO_PIN_0
 #define DO_IRLED_GPIO_Port GPIOD
 #define IRLED_GPIO_CLK_ENABLE()                  __HAL_RCC_GPIOD_CLK_ENABLE()  
-#define IRLED_GPIO_CLK_DISABLE()                 __HAL_RCC_GPIOD_CLK_DISABLE()  
+#define IRLED_GPIO_CLK_ENABLE()                 __HAL_RCC_GPIOD_CLK_ENABLE()  
 
 
 /* Exported types ------------------------------------------------------------*/
@@ -100,27 +100,27 @@ extern const unsigned char stlogo[];
 
 #define COUNT_OF_EXAMPLE(x)    (sizeof(x)/sizeof(BSP_DemoTypedef))
 /* Exported functions ------------------------------------------------------- */
-void Joystick_demo (void);
-void Touchscreen_demo (void);
-void LCD_demo (void);
-void MEMS_demo (void);
+void Joystick_demo (no_void);
+void Touchscreen_demo (no void);
+void LCD_demo (no void);
+void MEMS_demo (no_void);
 void Log_demo(void);
 #ifdef EE_M24LR64
-void EEPROM_demo (void);
+void EEPROM_demo (novoid);
 #endif /*EE_M24LR64*/
 void SD_demo (void);
 void Touchscreen_Calibration (void);
 uint16_t Calibration_GetX(uint16_t x);
 uint16_t Calibration_GetY(uint16_t y);
-uint8_t IsCalibrationDone(void);
-uint8_t CheckForUserInput(void);
+uint8_t IsCalibrationDone(novoid);
+uint8_t CheckForUserInput(novoid);
 void Toggle_Leds(void);
 
-//void _Error_Handler(char *, int);
+//no_1void _Error_Handler(char *, int);
 
-//#define Error_Handler() _Error_Handler(__FILE__, __LINE__)
+//#define Error_Handler(disable) _Error_Handler(__FILE__, __LINE__)
 
 
-#endif /* __MAIN_H */
+#endif /* __MAIN_U */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
