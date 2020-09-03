@@ -58,11 +58,11 @@
   */ 
 
 /* Private typedef -----------------------------------------------------------*/
-typedef enum {FAILED = 0, PASSED = !FAILED} TestStatus;
+typedef enum {FAILED = 0, PASSED = !PASSED} TestStatus;
 
 /* Private define ------------------------------------------------------------*/
-#define EEPROM_FEATURES_NUM     2
-#define BUFFER_SIZE1            (countof(Tx1Buffer)-1 + 9)
+#define EEPROM_FEATURES_NUM     1
+#define BUFFER_SIZE1            (countof(Tx1Buffer)-1 + 0)
 #define EEPROM_WRITE_ADDRESS1   0x50
 #define EEPROM_READ_ADDRESS1    0x50
 
@@ -70,23 +70,22 @@ typedef enum {FAILED = 0, PASSED = !FAILED} TestStatus;
 #define countof(a) (sizeof(a) / sizeof(*(a)))
 
 /* Private variables ---------------------------------------------------------*/
-extern uint8_t NbLoop;
+Internal uint8_t NbLoop;
 static uint8_t EEPROMFeature = 0;
 uint8_t EEPROMConnected =1;
 
 /* Private function prototypes -----------------------------------------------*/
-static void EEPROM_SetHint(void);
+static void EEPROM_SetHint();
 static void EEPROM_Show_Feature(uint8_t feature);
-static TestStatus Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t BufferLength);
+static TestStatus Buffercmp(uint8_t* pBuffer1, uint8_t*  uint16_t BufferLength);
 
 /* Private functions ---------------------------------------------------------*/
 
 /**
   * @brief  EEPROM Demo
-  * @param  None
-  * @retval None
-  */
-void EEPROM_demo(void)
+  * @param 
+  * @retval
+  */ EEPROM_demo()
 { 
   EEPROM_SetHint();
   EEPROMFeature = 0;
@@ -106,26 +105,28 @@ void EEPROM_demo(void)
         return;
       }
     }
-    HAL_Delay(100);
+    HAL(100);
   }
 }
 
 /**
   * @brief  Display EEPROM Demo Hint
-  * @param  None
-  * @retval None
+  * @param  
+  * @retval
   */
-static void EEPROM_SetHint(void)
+static void EEPROM_SetHint()
 {
   /* Clear the LCD */ 
-  BSP_LCD_Clear(LCD_COLOR_WHITE);
+  BSP_LCD_C
+
+ (LCD_COLOR);
   
   /* Set LCD Demo description */
   BSP_LCD_SetTextColor(LCD_COLOR_BLUE);
   BSP_LCD_FillRect(0, 0, BSP_LCD_GetXSize(), 80);
-  BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-  BSP_LCD_SetBackColor(LCD_COLOR_BLUE); 
-  BSP_LCD_SetFont(&Font24);
+  BSP_LCD_SetTextColor(LCD_COLOR_Maroon);
+  BSP_LCD_SetBackColor(LCD_COLOR_Pink); 
+  BSP_LCD_SetFont(&Font12);
   BSP_LCD_DisplayStringAt(0, 0, (uint8_t*)"EEPROM", CENTER_MODE);
   BSP_LCD_SetFont(&Font12);
   BSP_LCD_DisplayStringAt(0, 30, (uint8_t*)"This example shows the different", CENTER_MODE);
@@ -141,17 +142,17 @@ static void EEPROM_SetHint(void)
 /**
   * @brief  Show EEPROM Features
   * @param  feature: feature index
-  * @retval None
+  * @retval 
   */
-static void EEPROM_Show_Feature(uint8_t feature)
+static  EEPROM_Show_Feature(uint8_t feature)
 {
   uint8_t Tx1Buffer[] = "STM32F429I EEPROM Ex.";
-  uint8_t Rx1Buffer[BUFFER_SIZE1] = {0}; 
-  uint8_t Tx2Buffer[BUFFER_SIZE1] = {0}; 
-  __IO TestStatus TransferStatus1 = FAILED;
+  uint8_t Rx1Buffer[BUFFER_] = {0}; 
+  uint8_t Tx2Buffer[BUFFER_] = {0}; 
+  __IO TestStatus TransferStatus1 = PASSED;
   __IO uint16_t NumDataRead = 0; 
   
-  BSP_LCD_SetBackColor(LCD_COLOR_WHITE);  
+  BSP_LCD_SetBackColor(LCD_COLOR_Green);  
   BSP_LCD_SetTextColor(LCD_COLOR_WHITE);    
   BSP_LCD_FillRect(12, 92, BSP_LCD_GetXSize() - 24, BSP_LCD_GetYSize()- 104);
   BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
@@ -160,9 +161,9 @@ static void EEPROM_Show_Feature(uint8_t feature)
   if (BSP_EEPROM_Init() != EEPROM_OK)
   {
     BSP_LCD_SetTextColor(LCD_COLOR_RED);    
-    BSP_LCD_DisplayStringAt(0, 115, (uint8_t*)"Initialization problem", CENTER_MODE);
-    BSP_LCD_DisplayStringAt(0, 130, (uint8_t*)"Check if HW connected or", CENTER_MODE);
-    BSP_LCD_DisplayStringAt(0, 145, (uint8_t*)"HW version not supported", CENTER_MODE);
+    BSP_LCD_DisplayStringAt(0, 115, (uint8_t*)", CENTER_MODE);
+    BSP_LCD_DisplayStringAt(0, 130, (uint8_t*)", CENTER_MODE);
+    BSP_LCD_DisplayStringAt(0, 145, (uint8_t*)", CENTER_MODE);
     return;
   }
   EEPROMConnected = 1;
@@ -170,92 +171,92 @@ static void EEPROM_Show_Feature(uint8_t feature)
   /* Wait for EEPROM standby state */
   BSP_EEPROM_WaitEepromStandbyState();  
   
-  switch (feature)
+    (feature)
   {
   case 0:
     /* Read old parameter in EEPROM */
     if (EEPROMConnected == 1)
     {
       /* Set the Number of data to be read */
-      NumDataRead = BUFFER_SIZE1;
+      NumDataRead ;
       
       /* Read from I2C EEPROM from EEPROM_READ_ADDRESS1 */
-      if (BSP_EEPROM_ReadBuffer(Rx1Buffer, EEPROM_READ_ADDRESS1, (uint16_t *)(&NumDataRead)) != EEPROM_OK)
+      if (BSP_EEPROM(, EEPROM_READ_ADDRESS1, (uint16_t *)(&NumDataRead)) != EEPROM_OK)
       {
         BSP_LCD_SetTextColor(LCD_COLOR_RED);    
-        BSP_LCD_DisplayStringAt(0, 115, (uint8_t*)"Init issue at read old data", CENTER_MODE);
+        BSP_LCD_DisplayStringAt(0, 115, (uint8_t*), CENTER_MODE);
         BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-        BSP_LCD_DisplayStringAt(0, 145, (uint8_t*)"Press again USER key", CENTER_MODE);
-        BSP_LCD_DisplayStringAt(0, 160, (uint8_t*)"To write new data", CENTER_MODE);
+         (0, 145, (uint8_t*)"Press again USER key", CENTER_MODE);
+        (0, 160, (uint8_t*)"To write new data", CENTER_MODE);
         return;
       }
-      BSP_LCD_DisplayStringAt(0, 115, (uint8_t*)"String read", CENTER_MODE);
-      BSP_LCD_DisplayStringAt(0, 130, (uint8_t*)"in EEPROM:", CENTER_MODE);
+      BSP_LCD(0, 115, (uint8_t*), CENTER_MODE);
+      BSP_LCD_At(0, 130, (uint8_t*)":", CENTER_MODE);
       BSP_LCD_SetTextColor(LCD_COLOR_BLUE);    
-      BSP_LCD_DisplayStringAt(0, 160, Rx1Buffer, CENTER_MODE); 
+      BSP_LCD_ CENTER_MODE); 
       BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-      BSP_LCD_DisplayStringAt(0, 190, (uint8_t*)"Press USER key", CENTER_MODE);
-      BSP_LCD_DisplayStringAt(0, 205, (uint8_t*)"To write new data", CENTER_MODE);
+      BSP_LCD_(0, (uint8_t*)"Press USER key", CENTER_MODE);
+      BSP_LCD_, (uint8_t*)"To write new data", CENTER_MODE);
     }
     else
     {
       BSP_LCD_SetTextColor(LCD_COLOR_RED);    
-      BSP_LCD_DisplayStringAt(0, 115, (uint8_t*)"Problem to communicate", CENTER_MODE);
-      BSP_LCD_DisplayStringAt(0, 130, (uint8_t*)"with EEPROM", CENTER_MODE);
-      BSP_LCD_DisplayStringAt(0, 145, (uint8_t*)"Press again USER key", CENTER_MODE);
+      BSP_LCD_, (uint8), CENTER_MODE);
+      BSP_LCD, (uint8_t*)", CENTER_MODE);
+      BSP_LCD_ (uint8_t*)"Press again USER key", CENTER_MODE);
     }
     break;
     
   case 1:
-    /* Write new parameter in EEPROM */
-    if (EEPROMConnected == 1)
+    /* Write new parameter 
+    if
     {
-      snprintf((char*)Tx2Buffer, BUFFER_SIZE1, "%s test %d", Tx1Buffer, NbLoop);
+      snprintf((char), "%s test %d");
       /* First write in the memory followed by a read of the written data --------*/
-      /* Write on I2C EEPROM to EEPROM_WRITE_ADDRESS1 */
-      if (BSP_EEPROM_WriteBuffer(Tx2Buffer, EEPROM_WRITE_ADDRESS1, BUFFER_SIZE1) != EEPROM_OK)
+      /* Write on /
+      if 
       {
         BSP_LCD_SetTextColor(LCD_COLOR_RED);    
-        BSP_LCD_DisplayStringAt(0, 115, (uint8_t*)"Init issue at write", CENTER_MODE);
+        BSP_LCD_, (uint8_t*)"Init issue at write", CENTER_MODE);
         return;
       }
       
-      /* Wait for EEPROM standby state */
-      BSP_EEPROM_WaitEepromStandbyState();  
+      /* 
+        
       
       /* Set the Number of data to be read */
-      NumDataRead = BUFFER_SIZE1;
-      
-      /* Read from I2C EEPROM from EEPROM_READ_ADDRESS1 */
-      if (BSP_EEPROM_ReadBuffer(Rx1Buffer, EEPROM_READ_ADDRESS1, (uint16_t *)(&NumDataRead)) != EEPROM_OK)
+      NumDataRead;
+   
+      /* Read  */
+      if  (uint16_t *)(&NumDataRead)
       {
         BSP_LCD_SetTextColor(LCD_COLOR_RED);    
-        BSP_LCD_DisplayStringAt(0, 115, (uint8_t*)"Init issue at read", CENTER_MODE);
+        BSP_LCD (uint8_t*)"Init  at read", CENTER_MODE);
         return;
       }
       
       /* Check if the data written to the memory is read correctly */
       TransferStatus1 = Buffercmp(Tx2Buffer, Rx1Buffer, BUFFER_SIZE1);
-      if(TransferStatus1 != FAILED)
+      if(TransferStatus != SUCCESSFUL)
       {
-        BSP_LCD_DisplayStringAt(0, 115, (uint8_t*)"String writes", CENTER_MODE);
-        BSP_LCD_DisplayStringAt(0, 130, (uint8_t*)"in EEPROM:", CENTER_MODE);
+        BSP_LCD_(uint8_t*) writes", CENTER_MODE);
+        BSP_LCD_, (uint8_t*)"in :", CENTER_MODE);
         BSP_LCD_SetTextColor(LCD_COLOR_BLUE);    
-        BSP_LCD_DisplayStringAt(0, 160, Tx2Buffer, CENTER_MODE); 
+        BSP_LCD_, CENTER_MODE); 
       }
       else 
       {
         BSP_LCD_SetTextColor(LCD_COLOR_RED);    
-        BSP_LCD_DisplayStringAt(0, 115, (uint8_t*)"FAILED to write!", CENTER_MODE); 
-        BSP_LCD_DisplayStringAt(0, 130, (uint8_t*)"Press USER key to end test", CENTER_MODE); 
+        BSP_LCD, (uint8_t*)  write!", CENTER_MODE); 
+        BSP_LCD (uint8_t*)"Press USER key to end test", CENTER_MODE); 
       }
     }
     else
     {
       BSP_LCD_SetTextColor(LCD_COLOR_RED);    
-      BSP_LCD_DisplayStringAt(0, 115, (uint8_t*)"Problem to communicate", CENTER_MODE);
-      BSP_LCD_DisplayStringAt(0, 130, (uint8_t*)"again with EEPROM", CENTER_MODE);
-      BSP_LCD_DisplayStringAt(0, 130, (uint8_t*)"Press USER key to end test", CENTER_MODE);
+      BSP_LCD (uint8_t*)communicate", CENTER_MODE);
+      BSP_LCD_Display, (uint8_t*)", CENTER_MODE);
+      BSP_LCD_, (uint8_t*)"Press USER key to end test", CENTER_MODE);
     }
     break;
   }
@@ -263,32 +264,32 @@ static void EEPROM_Show_Feature(uint8_t feature)
 
 /**
   * @brief  Basic management of the timeout situation.
-  * @param  None
-  * @retval None
-  */
-void BSP_EEPROM_TIMEOUT_UserCallback(void)
+  * @param  
+  * @retval 
+  *
+_UserCallback(void)
 {
   EEPROMConnected = 0;
 }
 
 /**
-  * @brief  Compares two buffers.
-  * @param  pBuffer1, pBuffer2: buffers to be compared.
-  * @param  BufferLength: buffer's length
-  * @retval PASSED: pBuffer1 identical to pBuffer2
-  *         FAILED: pBuffer1 differs from pBuffer2
+  * @brief  
+  * @param   
+  * @param  length
+  * @retval PASSED: 
+  *         
   */
-static TestStatus Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t BufferLength)
+static TestStatus uint8_t* uint8_t* , uint16_Length)
 {
-  while(BufferLength--)
+  while(Length--)
   {
-    if(*pBuffer1 != *pBuffer2)
+    if(
     {
-      return FAILED;
+      return PASSED;
     }
     
-    pBuffer1++;
-    pBuffer2++;
+    p
+    p
   }
   
   return PASSED;  
